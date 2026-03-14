@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Menu Struk Bank</title>
+
+<style>
+body, html {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+  height: 100%;
+  background: #000;
+  color: white;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Background Bara Api */
+#fireCanvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  filter: brightness(1.1);
+}
+
+.overlay {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  background: rgba(0,0,0,0.85);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+h1 {
+  color: orange;
+  margin-bottom: 40px;
+  text-align: center;
+}
+
+.menu-bar {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.menu-bar button {
+  padding: 15px 40px;
+  font-size: 18px;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  background: orange;
+  color: white;
+  box-shadow: 0 0 15px orange;
+  transition: 0.3s;
+  min-width: 180px;
+}
+
+.menu-bar button:hover {
+  background: darkorange;
+  transform: scale(1.05);
+}
+
+/* Tombol Back di pojok kiri atas */
+#backBtn {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  padding: 10px 18px;
+  font-weight: bold;
+  font-size: 14px;
+  background: #ff6d00;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  z-index: 10;
+  box-shadow: 0 0 8px #ff6d00;
+  transition: 0.3s;
+}
+#backBtn:hover {
+  background: darkorange;
+  transform: scale(1.05);
+}
+</style>
+</head>
+<body>
+
+<canvas id="fireCanvas"></canvas>
+
+<!-- Tombol Back -->
+<button id="backBtn" onclick="goBack()">Back</button>
+
+<div class="overlay">
+  <h1>MENU STRUK BANK</h1>
+
+  <div class="menu-bar">
+    <button onclick="goTo('bca.html')">BCA</button>
+    <button onclick="goTo('bni.html')">BNI</button>
+    <button onclick="goTo('bniwonder.html')">BNI WONDER</button>
+    <button onclick="goTo('mandiri.html')">MANDIRI</button>
+  </div>
+</div>
+
+<script>
+function goTo(page){
+  window.location.href = page;
+}
+
+// Fungsi back ke lengkap.html
+function goBack(){
+  window.location.href = "lengkap.html";
+}
+
+/* ================== BARA API EFFECT ================== */
+const canvas = document.getElementById('fireCanvas');
+const ctx = canvas.getContext('2d');
+let width, height;
+
+function resize(){
+  width = window.innerWidth;
+  height = window.innerHeight;
+  canvas.width = width;
+  canvas.height = height;
+}
+window.addEventListener('resize', resize);
+resize();
+
+class FireParticle {
+  constructor(){ this.reset(); }
+  reset(){
+    this.x = Math.random()*width;
+    this.y = height + 10 + Math.random()*100;
+    this.size = 10 + Math.random()*15;
+    this.speedY = 1 + Math.random()*3;
+    this.speedX = (Math.random()-0.5);
+    this.life = 0;
+    this.maxLife = 60 + Math.random()*40;
+  }
+  update(){
+    this.x += this.speedX;
+    this.y -= this.speedY;
+    this.life++;
+    if(this.life >= this.maxLife) this.reset();
+  }
+  draw(){
+    const gradient = ctx.createRadialGradient(this.x,this.y,0,this.x,this.y,this.size);
+    gradient.addColorStop(0,'rgba(255,255,255,1)');
+    gradient.addColorStop(0.3,'rgba(255,200,0,0.8)');
+    gradient.addColorStop(0.6,'rgba(255,100,0,0.5)');
+    gradient.addColorStop(1,'rgba(255,0,0,0)');
+    ctx.fillStyle = gradient;
+    ctx.beginPath();
+    ctx.arc(this.x,this.y,this.size,0,Math.PI*2);
+    ctx.fill();
+  }
+}
+
+const particles = [];
+for(let i=0;i<120;i++){
+  particles.push(new FireParticle());
+}
+
+function animate(){
+  ctx.clearRect(0,0,width,height);
+  particles.forEach(p=>{
+    p.update();
+    p.draw();
+  });
+  requestAnimationFrame(animate);
+}
+animate();
+</script>
+
+</body>
+</html>
