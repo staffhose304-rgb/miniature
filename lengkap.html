@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Dashboard Gabungan - Bara Api</title>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
+
+<style>
+/* ================= RUNNING TEXT ================= */
+.running-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: linear-gradient(to bottom, #d6b55c, #b68c2d);
+    color: black;
+    font-weight: bold;
+    padding: 8px 0;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    z-index: 9999;
+}
+
+.icon {
+    margin: 0 12px;
+    flex-shrink: 0;
+    font-size: 18px;
+}
+
+.marquee-wrapper {
+    overflow: hidden;
+    width: 100%;
+}
+
+.marquee {
+    display: inline-block;
+    white-space: nowrap;
+    padding-left: 100%;
+    animation: jalan 18s linear infinite;
+}
+
+@keyframes jalan {
+    from { transform: translateX(0); }
+    to { transform: translateX(-100%); }
+}
+
+.clock {
+    position: absolute;
+    right: 15px;
+    background: rgba(0, 0, 0, 0.85);
+    color: #fff;
+    padding: 5px 12px;
+    border-radius: 8px;
+    font-size: 14px;
+    letter-spacing: 1px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.6);
+}
+
+/* ================= BODY & DASHBOARD ================= */
+body, html {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    height: 100%;
+    background: url('sunwukong.jpg') no-repeat center center fixed;
+    background-size: cover;
+    color: white;
+    overflow-x: hidden;
+    position: relative;
+    padding-top: 45px;
+}
+
+#fireCanvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+    filter: brightness(1.1);
+}
+
+.overlay {
+    position: relative;
+    background: rgba(0, 0, 0, 0.6);
+    min-height: 100vh;
+    padding: 60px 20px;
+    z-index: 1;
+    max-width: 1000px;
+    margin: auto;
+    box-sizing: border-box;
+}
+
+h2 {
+    color: orange;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.menu-bar {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.menu-bar button {
+    padding: 12px 24px;
+    font-weight: bold;
+    font-size: 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    background: orange;
+    color: white;
+    flex: 1;
+    max-width: 200px;
+    box-shadow: 0 0 10px orange;
+    transition: background 0.3s ease;
+}
+
+.menu-bar button:hover { background: darkorange; }
+.menu-bar button.active { background: darkorange; }
+
+#backBtn {
+    position: fixed;
+    top: 50px;
+    left: 10px;
+    width: 400px;
+    height: 40px;
+    background: #ff6d00;
+    border-radius: 6px;
+    box-shadow: 0 0 8px #ff6d00;
+    color: white;
+    font-weight: bold;
+    font-size: 16px;
+    padding: 8px 0;
+    overflow: hidden;
+    cursor: pointer;
+    z-index: 10;
+    border: none;
+}
+
+#backBtn span {
+    display: inline-block;
+    white-space: nowrap;
+    padding-left: 100%;
+    animation: marqueeLinear 10s linear infinite;
+}
+
+@keyframes marqueeLinear {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-100%); }
+}
+
+.section { display: none; margin-bottom: 50px; }
+
+textarea, input[type="file"] {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 8px;
+    border: none;
+    font-size: 14px;
+    font-family: monospace;
+    background: #222;
+    color: #fff;
+    box-shadow: inset 0 0 6px #ff6d00;
+    resize: none;
+    box-sizing: border-box;
+}
+
+#hasil, #hasilStruk { height: 300px; }
+
+img.preview-img {
+    max-width: 100%;
+    margin-top: 20px;
+    border-radius: 10px;
+    border: 2px solid orange;
+    box-shadow: 0 0 10px orange;
+}
+
+table { width: 100%; border-collapse: collapse; margin-top: 20px; display: block; overflow-x: auto; }
+th, td { border: 1px solid #ccc; padding: 6px; text-align: center; white-space: nowrap; font-size: 12px; }
+th { background: #333; color: white; }
+tr.total-row { font-weight: bold; background-color: #004d40; color: white; }
+
+/* ================= KPI UPLOAD STYLE ================= */
+.title.kpi { text-align:center; color:orange; margin-bottom:20px; }
+.upload.kpi { display:block; margin:auto; padding:10px; border-radius:8px; border:2px solid orange; background:#1a1a1a; color:white; cursor:pointer; }
+#kpiTable{ margin-top:25px; display:flex; justify-content:center; }
+table.kpi{ border-collapse:collapse; width:850px; background:#1c1c1c; box-shadow:0 0 12px orange; }
+th.kpi{ background:linear-gradient(90deg,#ff9f00,#ff6d00); padding:10px; color:white; }
+td.kpi{ padding:10px; border:1px solid #333; text-align:center; color:white; }
+td.admin.kpi{ text-align:left; font-weight:bold; color:#ffb347; }
+button.copy.kpi{ background:orange; border:none; padding:6px 12px; color:white; border-radius:5px; cursor:pointer; }
+button.copy.kpi:hover{ background:#cc7a00; }
+</style>
+</head>
+
+<body>
+<div class="running-bar">
+    <div class="icon">🔊</div>
+    <div class="marquee-wrapper">
+        <div class="marquee">Anes si paling berbakti dan tidak sombong</div>
+    </div>
+    <div class="clock" id="clock"></div>
+</div>
+
+<button id="backBtn" onclick="window.history.back()"><span>miko si paling kodam</span></button>
+
+<canvas id="fireCanvas"></canvas>
+
+<div class="overlay">
+    <div class="menu-bar">
+        <button id="refreshBtn">Refresh</button>
+        <button id="menuValidasi">Validasi Rekening</button>
+        <button id="menuPGSoft">PGSOFT</button>
+        <button id="menuOCR">OCR + CSV</button>
+        <button id="menuStruk">STRUK</button>
+        <button id="menuKPI">KPI Upload</button>
+    </div>
+
+    <!-- VALIDASI -->
+    <div class="section" id="sectionValidasi">
+        <h2>Validasi Jumlah Rekening</h2>
+        <textarea id="inputData" placeholder="Paste data lengkap di sini..."></textarea><br />
+        <button onclick="prosesData()">Proses Data</button>
+        <button onclick="copyHasil()">Copy Hasil</button>
+        <table>
+            <thead><tr id="bankHeader"></tr></thead>
+            <tbody>
+                <tr id="bankData"></tr>
+                <tr id="totalRow" class="total-row"></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- PGSOFT -->
+    <div class="section" id="sectionPGSoft">
+        <h2>Ringkasan Transaksi User</h2>
+        <textarea id="dataInput" placeholder="Paste seluruh data transaksi di sini..."></textarea><br />
+        <button onclick="prosesRingkasan()">Tampilkan Ringkasan</button>
+        <button onclick="copyHasilPGSoft()">Copy Hasil</button>
+        <table>
+            <thead>
+                <tr>
+                    <th>USER ID</th>
+                    <th>NAMA REKENING</th>
+                    <th>NOMOR REKENING</th>
+                    <th>PERMAINAN</th>
+                    <th>PERIODE</th>
+                    <th>TOTAL WIN</th>
+                    <th>TARUHAN</th>
+                </tr>
+            </thead>
+            <tbody id="hasilBody"></tbody>
+        </table>
+    </div>
+
+    <!-- OCR + CSV -->
+    <div class="section" id="sectionOCR">
+        <h2>OCR + CSV Viewer</h2>
+        <input type="file" id="uploadImage" accept="image/*" />
+        <p>Atau tekan <b>Ctrl + V</b> untuk paste gambar dari clipboard</p>
+        <img id="preview" class="preview-img" />
+        <button onclick="prosesOCR()">Proses OCR</button>
+        <textarea id="hasil" readonly></textarea>
+
+        <h3>CSV Viewer</h3>
+        <input type="file" id="uploadCSV" accept=".csv" />
+        <div id="csvOutput"></div>
+    </div>
+
+    <!-- KPI UPLOAD -->
+    <div class="section" id="sectionKPIUpload">
+        <h2 class="title kpi">KPI Upload</h2>
+        <input type="file" id="kpiCsvFile" accept=".csv" class="upload kpi">
+        <div id="kpiTable"></div>
+    </div>
+</div>
+
+<script>
+// ================= MENU =================
+const sections = {
+    menuValidasi: 'sectionValidasi',
+    menuPGSoft: 'sectionPGSoft',
+    menuOCR: 'sectionOCR',
+    menuKPI: 'sectionKPIUpload'
+};
+function showSection(menuId) {
+    Object.values(sections).forEach(id => document.getElementById(id).style.display='none');
+    Object.keys(sections).forEach(k => document.getElementById(k).classList.remove('active'));
+    if(sections[menuId]){
+        document.getElementById(sections[menuId]).style.display='block';
+        document.getElementById(menuId).classList.add('active');
+    }
+}
+document.getElementById('menuStruk').onclick = () => { window.location.href="penyalur.html"; };
+showSection('menuValidasi');
+document.getElementById('menuValidasi').onclick = () => showSection('menuValidasi');
+document.getElementById('menuPGSoft').onclick = () => showSection('menuPGSoft');
+document.getElementById('menuOCR').onclick = () => showSection('menuOCR');
+document.getElementById('menuKPI').onclick = () => showSection('menuKPI');
+
+// ================= REFRESH =================
+document.getElementById('refreshBtn').onclick = () => {
+    document.getElementById('inputData').value='';
+    banks.forEach(b => bankCount[b]=0); renderTable();
+    document.getElementById('dataInput').value=''; document.getElementById('hasilBody').innerHTML='';
+    document.getElementById('uploadImage').value=''; document.getElementById('preview').src=''; document.getElementById('hasil').value='';
+    document.getElementById('uploadCSV').value=''; document.getElementById('csvOutput').innerHTML='';
+    document.getElementById('kpiCsvFile').value=''; document.getElementById('kpiTable').innerHTML='';
+};
+
+// ================= VALIDASI =================
+const banks=["JAGO","BCA","BNI","BRI","MDR","DNM","CIMB","BSI","OVO","GOPAY","MAYBANK","MEGA","OCBC","PANIN","PERMATA","SINARMAS","ALLO","DANA","LINKAJA","SEABANK"];
+let bankCount={};
+function initTable(){ 
+    const header=document.getElementById("bankHeader"); header.innerHTML=""; 
+    banks.forEach(b=>{ bankCount[b]=0; let th=document.createElement("th"); th.textContent=b; header.appendChild(th);});
+    renderTable();
+}
+function renderTable(){ 
+    const dataRow=document.getElementById("bankData"), totalRow=document.getElementById("totalRow");
+    dataRow.innerHTML=""; totalRow.innerHTML="";
+    let grandTotal=0; banks.forEach(b=>{ let td=document.createElement("td"); td.textContent=bankCount[b]; dataRow.appendChild(td); grandTotal+=bankCount[b]; });
+    banks.forEach((b,i)=>{ let td=document.createElement("td"); td.textContent=(i===banks.length-1)?grandTotal:""; totalRow.appendChild(td); });
+}
+function normalisasiBank(nama){ nama=nama.toUpperCase().trim(); if(nama.includes("BANKJAGO")) return "JAGO"; if(nama.includes("MANDIRI")) return "MDR"; return nama; }
+function prosesData(){ banks.forEach(b=>bankCount[b]=0); const raw=document.getElementById("inputData").value.split("\n"); raw.forEach(line=>{ const match=line.match(/([A-Z]+)[^A-Z0-9]*,/i); if(match){ let bankName=normalisasiBank(match[1]); if(banks.includes(bankName)) bankCount[bankName]++; } }); renderTable(); }
+function copyHasil(){ let angkaOnly=banks.map(b=>bankCount[b]).join("\t"); navigator.clipboard.writeText(angkaOnly).then(()=>alert("Berhasil di-copy!")).catch(()=>alert("Gagal copy")); }
+initTable();
+
+// ================= PGSOFT =================
+function prosesRingkasan(){
+    const raw=document.getElementById('dataInput').value;
+    const lines=raw.split('\n').map(l=>l.trim()).filter(l=>l!='');
+    let userId='', permainan='', periode='', totalWin=0, taruhan=0;
+    for(let i=0;i<lines.length;i++){
+        const line=lines[i];
+        if(!userId && i>0 && lines[i-1].startsWith('Ext. ID')) userId=line;
+        if(!permainan) permainan=lines[0];
+        if(line.startsWith('Ext. ID')){
+            const match=line.match(/(\d{16,19})/); if(match) periode=match[1];
+        }
+        if(line.toLowerCase()==='credit' && i+1<lines.length){ const match=lines[i+1].match(/IDR\s*([\d,]+)/); if(match) totalWin+=parseInt(match[1].replace(/,/g,'')); }
+        if(line.toLowerCase()==='debit' && i+1<lines.length){ const match=lines[i+1].match(/IDR\s*([\d,]+)/); if(match) taruhan=parseInt(match[1].replace(/,/g,'')); }
+    }
+    document.getElementById('hasilBody').innerHTML=`<tr>
+        <td>${userId}</td><td>-</td><td>-</td><td>${permainan}</td><td>${periode}</td>
+        <td>${totalWin.toLocaleString('id-ID').replace(/\./g,',')}</td>
+        <td>${taruhan.toLocaleString('id-ID').replace(/\./g,',')}</td>
+    </tr>`;
+}
+function copyHasilPGSoft(){
+    const tbody=document.getElementById('hasilBody'); if(!tbody||tbody.rows.length===0) return;
+    const row=tbody.rows[0]; const data=Array.from(row.cells).map(c=>c.textContent.trim());
+    navigator.clipboard.writeText(data.join('\t')).then(()=>alert('Hasil berhasil dicopy!')).catch(()=>alert('Gagal copy hasil!'));
+}
+
+// ================= OCR + CSV =================
+const uploadImage=document.getElementById('uploadImage'); 
+const previewImg=document.getElementById('preview'); 
+const hasilTextArea=document.getElementById('hasil'); 
+const uploadCSV=document.getElementById('uploadCSV'); 
+const csvOutput=document.getElementById('csvOutput');
+
+uploadImage.addEventListener('change',e=>{ 
+    const file=e.target.files[0]; 
+    if(!file) return; 
+    const url=URL.createObjectURL(file); 
+    previewImg.src=url; 
+});
+
+// PASTE IMAGE DARI CLIPBOARD (CTRL + V)
+document.addEventListener('paste', function(e){
+    const items = e.clipboardData.items;
+    for(let i = 0; i < items.length; i++){
+        if(items[i].type.indexOf("image") !== -1){
+            const blob = items[i].getAsFile();
+            const url = URL.createObjectURL(blob);
+            previewImg.src = url;
+        }
+    }
+});
+
+// Optional: OCR otomatis saat paste
+previewImg.onload = function(){ prosesOCR(); };
+
+async function prosesOCR(){
+    if(!previewImg.src){ alert('Silakan upload gambar terlebih dahulu!'); return; }
+    hasilTextArea.value='Memproses OCR, mohon tunggu...';
+    try{ const result=await Tesseract.recognize(previewImg.src,'eng+ind',{logger:m=>console.log(m)}); hasilTextArea.value=result.data.text.trim(); }
+    catch(error){ hasilTextArea.value='Gagal memproses OCR!'; console.error(error); }
+}
+
+uploadCSV.addEventListener('change',e=>{
+    const file=e.target.files[0]; if(!file) return;
+    const reader=new FileReader();
+    reader.onload=function(ev){
+        const csv=ev.target.result; let rows=csv.trim().split('\n').map(r=>r.split(','));
+        let html='<table><thead><tr>'; rows[0].forEach(col=>{html+=`<th>${col.trim()}</th>`}); html+='</tr></thead><tbody>';
+        rows.slice(1).forEach(row=>{ html+='<tr>'; row.forEach(col=>{html+=`<td>${col.trim()}</td>`}); html+='</tr>'; });
+        html+='</tbody></table>'; csvOutput.innerHTML=html;
+    }; reader.readAsText(file);
+});
+
+// ================= KPI UPLOAD =================
+const kpiCsvInput=document.getElementById("kpiCsvFile");
+const kpiTableContainer=document.getElementById("kpiTable");
+kpiCsvInput.addEventListener("change",function(e){
+    const file=e.target.files[0]; if(!file) return;
+    const reader=new FileReader();
+    reader.onload=function(ev){
+        const csv=ev.target.result;
+        const rows=csv.trim().split("\n").map(r=>r.split(","));
+        let data={};
+        rows.slice(1).forEach(r=>{
+            if(r.length<4) return;
+            const info=r[1].replace(/"/g,"").toLowerCase();
+            const admin=r[3].replace(/"/g,"").trim();
+            if(!admin) return;
+            if(!data[admin]) data[admin]={dp:0,reject:0,wd:0,bantuDP:0,bantuWD:0};
+            if(info.includes('deposit') && !info.includes('reject')) data[admin].dp++;
+            else if(info.includes('reject') && info.includes('deposit')) data[admin].reject++;
+            else if(info.includes('withdraw') && !info.includes('reject')) data[admin].wd++;
+        });
+        renderKpiTable(data);
+    };
+    reader.readAsText(file);
+});
+
+function renderKpiTable(data){
+    let html=`<table class="kpi"><thead>
+        <tr><th class="kpi">ADMIN</th><th class="kpi">DEPOSIT</th><th class="kpi">BANTU DP</th><th class="kpi">REJECT DP</th><th class="kpi">WITHDRAW</th><th class="kpi">BANTU WD</th><th class="kpi">COPY</th></tr>
+    </thead><tbody>`;
+    Object.keys(data).sort().forEach(admin=>{
+        const d=data[admin];
+        html+=`<tr>
+            <td class="admin kpi">${admin}</td>
+            <td class="kpi">${d.dp}</td>
+            <td class="kpi">${d.bantuDP}</td>
+            <td class="kpi">${d.reject}</td>
+            <td class="kpi">${d.wd}</td>
+            <td class="kpi">${d.bantuWD}</td>
+            <td class="kpi"><button class="copy kpi" onclick="copyRow('${admin}',${d.dp},${d.bantuDP},${d.reject},${d.wd},${d.bantuWD})">COPY</button></td>
+        </tr>`;
+    });
+    html+='</tbody></table>'; kpiTableContainer.innerHTML=html;
+}
+
+window.copyRow=function(admin,dp,bantuDP,reject,wd,bantuWD){
+    const text=`${dp}\t${bantuDP}\t${reject}\t${wd}\t${bantuWD}`;
+    navigator.clipboard.writeText(text).then(()=>alert("Copied "+admin)).catch(()=>alert("Gagal menyalin "+admin));
+};
+
+// ================= JAM =================
+function updateClock(){
+    const now=new Date();
+    const d=now.toLocaleDateString('id-ID',{weekday:'short',day:'2-digit',month:'short',year:'numeric'});
+    const t=now.toLocaleTimeString('id-ID');
+    document.getElementById('clock').textContent=`${d} ${t}`;
+}
+setInterval(updateClock,1000); updateClock();
+
+// ================= CANVAS FIRE =================
+const canvas=document.getElementById("fireCanvas"); const ctx=canvas.getContext("2d");
+let W,H,particles=[];
+function setup(){
+    W=window.innerWidth; H=window.innerHeight; canvas.width=W; canvas.height=H;
+    particles=[]; for(let i=0;i<300;i++){ particles.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()*2+1,dx:(Math.random()-0.5)*1,dy:-Math.random()*1.5-0.5,life:Math.random()*100+50,maxLife:100});}
+}
+function draw(){
+    ctx.clearRect(0,0,W,H);
+    particles.forEach(p=>{
+        const alpha=1-p.life/p.maxLife;
+        const gradient=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.r*8);
+        gradient.addColorStop(0,`rgba(255,${Math.floor(200+55*alpha)},0,${alpha})`);
+        gradient.addColorStop(1,`rgba(255,0,0,0)`);
+        ctx.fillStyle=gradient; ctx.beginPath(); ctx.arc(p.x,p.y,p.r*8,0,Math.PI*2); ctx.fill();
+        p.x+=p.dx; p.y+=p.dy; p.life-=1; if(p.life<=0){ p.x=Math.random()*W; p.y=H; p.life=p.maxLife;}
+    });
+    requestAnimationFrame(draw);
+}
+setup(); draw();
+window.addEventListener('resize',()=>{ setup(); });
+</script>
+</body>
+</html>
