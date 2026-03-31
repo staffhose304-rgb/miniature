@@ -64,7 +64,7 @@ body, html {
     padding: 0;
     font-family: Arial, sans-serif;
     height: 100%;
-    background: url('sunwukong.jpg') no-repeat center center fixed;
+    background: url('labu.png') no-repeat center center fixed;
     background-size: cover;
     color: white;
     overflow-x: hidden;
@@ -206,12 +206,12 @@ button.copy.kpi:hover{ background:#cc7a00; }
 <div class="running-bar">
     <div class="icon">🔊</div>
     <div class="marquee-wrapper">
-        <div class="marquee">Anes si paling berbakti dan tidak sombong</div>
+        <div class="marquee">Anes si paling berbakti dan tidak sombong dan raja geol geol</div>
     </div>
     <div class="clock" id="clock"></div>
 </div>
 
-<button id="backBtn" onclick="window.history.back()"><span>miko si paling kodam</span></button>
+<button id="backBtn" onclick="window.history.back()"><span>Miko pengendali Kodam</span></button>
 
 <canvas id="fireCanvas"></canvas>
 
@@ -223,6 +223,8 @@ button.copy.kpi:hover{ background:#cc7a00; }
         <button id="menuOCR">OCR + CSV</button>
         <button id="menuStruk">STRUK</button>
         <button id="menuKPI">KPI Upload</button>
+        <button id="menuRekapan">REKAPAN</button>
+        <button id="menuDuplicate">Dublicate</button>
     </div>
 
     <!-- VALIDASI -->
@@ -300,8 +302,23 @@ function showSection(menuId) {
         document.getElementById(menuId).classList.add('active');
     }
 }
-document.getElementById('menuStruk').onclick = () => { window.location.href="penyalur.html"; };
+
+document.getElementById('menuDuplicate').onclick = () => {
+    window.location.href = "Dublicate.html"; // langsung ke halaman Dublicate
+};
+
+document.getElementById('menuRekapan').onclick = () => {
+    window.location.href = "rekapan.html"; // langsung ke halaman baru
+};
+
+document.getElementById('menuStruk').onclick = () => {
+    window.location.href = "penyalur.html"; // langsung ke halaman penyalur
+};
+
+// tampilkan section default
 showSection('menuValidasi');
+
+// tombol menu lain tetap pakai showSection
 document.getElementById('menuValidasi').onclick = () => showSection('menuValidasi');
 document.getElementById('menuPGSoft').onclick = () => showSection('menuPGSoft');
 document.getElementById('menuOCR').onclick = () => showSection('menuOCR');
