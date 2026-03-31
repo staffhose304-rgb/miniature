@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Menu Rekapan</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: url('background.jpg') no-repeat center center fixed;
+    background-size: cover;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    color: white;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .container {
+    width: 90%;
+    max-width: 1000px;
+    background: rgba(0,0,0,0.85);
+    padding: 20px;
+    margin-top: 40px;
+    border-radius: 12px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .back-btn {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    padding: 8px 15px;
+    background: orange;
+    color: white;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    box-shadow: 0 0 6px orange;
+    z-index: 3;
+  }
+  .back-btn:hover {
+    background: darkorange;
+  }
+
+  textarea {
+    width: 100%;
+    height: 150px;
+    font-family: monospace;
+    font-size: 14px;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    border: none;
+    background: #333;
+    color: white;
+    box-sizing: border-box;
+    position: relative;
+    z-index: 2;
+  }
+
+  button.action-btn {
+    padding: 8px 15px;
+    margin-right: 10px;
+    background: orange;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    color: white;
+    box-shadow: 0 0 6px orange;
+    position: relative;
+    z-index: 2;
+  }
+  button.action-btn:hover {
+    background: darkorange;
+  }
+
+  #rekapanOutput {
+    margin-top: 15px;
+    overflow-x: auto;
+    position: relative;
+    z-index: 2;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  th, td {
+    border: 1px solid #ccc;
+    padding: 6px 10px;
+    text-align: right;
+  }
+  th {
+    background: #ff9900;
+    color: black;
+  }
+  th.sub {
+    background: #ffd699;
+  }
+  td.blue {
+    color: blue;
+    font-weight: bold;
+  }
+  td.red {
+    color: red;
+    font-weight: bold;
+  }
+
+  /* Container api */
+  .fire-container {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 300px;
+    pointer-events: none;
+    overflow: visible;
+    z-index: 1;
+  }
+
+  .flame {
+    position: absolute;
+    bottom: 0;
+    border-radius: 50%;
+    opacity: 0.7;
+    filter: blur(4px);
+    animation-name: rise;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+  }
+
+  .spark {
+    position: absolute;
+    bottom: 0;
+    width: 2px;
+    height: 2px;
+    background: yellow;
+    border-radius: 50%;
+    opacity: 0.8;
+    animation-name: sparkRise;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+  }
+
+  @keyframes rise {
+    0% { transform: translateY(0) scale(1); opacity: 0.7; }
+    50% { transform: translateY(-80px) scale(1.2); opacity: 0.5; }
+    100% { transform: translateY(-250px) scale(0.5); opacity: 0; }
+  }
+
+  @keyframes sparkRise {
+    0% { transform: translateY(0) scale(1); opacity: 0.8; }
+    100% { transform: translateY(-300px) scale(0.2); opacity: 0; }
+  }
+</style>
+</head>
+<body>
+
+<button class="back-btn" onclick="goBack()">Back</button>
+
+<div class="container">
+<h2>Rekapan Data Laporan</h2>
+
+<textarea id="rekapanInput" placeholder="Paste data laporan di sini, setiap kolom dipisah tab (TO, WL)"></textarea>
+
+<button class="action-btn" onclick="convertRekapan()">Convert</button>
+<button class="action-btn" onclick="copyRekapan()">Copy Nominal</button>
+
+<div id="rekapanOutput"></div>
+</div>
+
+<div class="fire-container" id="fireContainer"></div>
+
+<script>
+// Membuat api lebih hidup
+const fireContainer = document.getElementById('fireContainer');
+
+// Tambahkan flame besar
+for(let i=0; i<30; i++){
+    const flame = document.createElement('div');
+    flame.classList.add('flame');
+    flame.style.left = Math.random() * 100 + '%';
+    flame.style.width = 10 + Math.random()*20 + 'px';
+    flame.style.height = 20 + Math.random()*50 + 'px';
+    flame.style.background = `radial-gradient(circle, rgba(255,${100+Math.random()*155},0,1) 0%, rgba(255,0,0,0.5) 70%, transparent 100%)`;
+    flame.style.animationDuration = (1 + Math.random()*2) + 's';
+    fireContainer.appendChild(flame);
+}
+
+// Tambahkan percikan kecil
+for(let i=0; i<50; i++){
+    const spark = document.createElement('div');
+    spark.classList.add('spark');
+    spark.style.left = Math.random() * 100 + '%';
+    spark.style.animationDuration = (0.5 + Math.random()*1.5) + 's';
+    fireContainer.appendChild(spark);
+}
+
+// Fungsi Rekapan (sama seperti sebelumnya)
+function parseNumber(val) {
+    if (!val) return 0;
+    val = val.replace(/,/g, "").trim();
+    if (val.startsWith("(") && val.endsWith(")")) {
+        return -parseFloat(val.replace(/[()]/g, ""));
+    }
+    return parseFloat(val) || 0;
+}
+
+function formatNumber(num) {
+    let sign = num < 0 ? "-" : "";
+    let abs = Math.abs(num);
+    return sign + abs.toLocaleString("en-US", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    });
+}
+
+function convertRekapan() {
+    const text = document.getElementById("rekapanInput").value.trim();
+    if (!text) { alert("Masukkan data terlebih dahulu!"); return; }
+    const rows = text.split("\n");
+    let data = {};
+    rows.forEach(r => {
+        const col = r.split(/\t+/);
+        const name = col[0]?.toLowerCase();
+        const turnover = parseNumber(col[1]);
+        const wl = parseNumber(col[3]);
+        if (name) data[name] = { to: turnover, wl: wl };
+    });
+
+    const mapping = {
+        "TOGEL": "toto",
+        "TOTOMACAU 4D": "totomacau 4d",
+        "TOTOMACAU 5D": "totomacau 5d",
+        "PRAGMATIC PLAY": "pragmatic play",
+        "E-LOTTERY": "elottery",
+        "ARCADE": "arcade",
+        "POKER": "poker",
+        "TOTALAN LIVEGAMES": "live game",
+        "SLOT": "slot"
+    };
+
+    let html = "<table><tr>";
+    for (let key in mapping) html += `<th colspan='2'>${key}</th>`;
+    html += "</tr><tr>";
+    for (let key in mapping) html += "<th class='sub'>TO</th><th class='sub'>WL</th>";
+    html += "</tr><tr>";
+    for (let key in mapping) {
+        const g = data[mapping[key]];
+        if (!g) { html += "<td></td><td></td>"; }
+        else {
+            const wlFlipped = g.wl * -1;
+            html += `<td class='blue'>${formatNumber(g.to)}</td>`;
+            html += `<td class='red'>${formatNumber(wlFlipped)}</td>`;
+        }
+    }
+    html += "</tr></table>";
+    document.getElementById("rekapanOutput").innerHTML = html;
+}
+
+function copyRekapan() {
+    const output = document.getElementById("rekapanOutput");
+    const cells = output.querySelectorAll("td");
+    if (!cells.length) { alert("Tidak ada data untuk dicopy!"); return; }
+    const result = Array.from(cells).map(c => c.innerText);
+    navigator.clipboard.writeText(result.join("\t"))
+        .then(() => alert("Nominal berhasil dicopy!"))
+        .catch(() => alert("Gagal menyalin data."));
+}
+
+function goBack() { window.location.href = "index.html"; }
+</script>
+</body>
+</html>
