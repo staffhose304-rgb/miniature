@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cek Sinkron Data Pemain</title>
+
+<style>
+body, html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: Arial;
+  background: url('tuktuk.jpg') no-repeat center center fixed;
+  background-size: cover;
+  color: white;
+}
+
+#fireCanvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.overlay {
+  position: relative;
+  background: rgba(0,0,0,0.85);
+  min-height: 100vh;
+  padding: 60px 20px;
+  z-index: 1;
+  max-width: 900px;
+  margin: auto;
+}
+
+h2 {
+  text-align: center;
+  color: orange;
+}
+
+h3 {
+  margin-top: 30px;
+}
+
+textarea {
+  width: 100%;
+  height: 150px;
+  margin-top: 10px;
+  background: #222;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 6px;
+  font-family: monospace;
+}
+
+button {
+  margin-top: 15px;
+  padding: 10px 20px;
+  background: orange;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 0 10px orange;
+  margin-right: 10px;
+}
+
+button:hover {
+  background: darkorange;
+}
+
+table {
+  width: 100%;
+  margin-top: 20px;
+  border-collapse: collapse;
+  background: #222;
+}
+
+th, td {
+  border: 1px solid #555;
+  padding: 8px;
+}
+
+th {
+  background: #333;
+}
+
+.info {
+  margin-top: 20px;
+  padding: 12px;
+  background: green;
+  border-radius: 6px;
+  text-align: center;
+  font-weight: bold;
+}
+
+.tidak1 {
+  color: #ff4d4d;
+}
+
+.tidak2 {
+  color: #ffd700;
+}
+
+#menuTop {
+  position: fixed;
+  top: 10px;
+  left: 20px;
+  z-index: 10;
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="fireCanvas"></canvas>
+
+<div id="menuTop">
+  <button onclick="goBack()">BACK</button>
+  <button onclick="resetAll()">REFRESH</button>
+</div>
+
+<div class="overlay">
+
+<h2>Cek Sinkron Data Pemain</h2>
+
+<h3>Data 1 (Tabel dari Excel)</h3>
+<textarea id="data1" placeholder="Paste data tabel di sini..."></textarea>
+
+<h3>Data 2 (List Nama)</h3>
+<textarea id="data2" placeholder="Paste list nama di sini..."></textarea>
+
+<button onclick="cekData()">PROSES</button>
+
+<h3>Hasil Perbandingan:</h3>
+<table>
+<thead>
+<tr>
+<th>No</th>
+<th>Nama Pemain</th>
+<th>Keterangan</th>
+</tr>
+</thead>
+<tbody id="hasil"></tbody>
+</table>
+
+<div id="infoBox"></div>
+
+</div>
+
+<script>
+// ================== LOGIC CEK DATA ==================
+function cekData() {
+  const raw1 = document.getElementById("data1").value.trim();
+  const raw2 = document.getElementById("data2").value.trim();
+
+  const lines1 = raw1.split("\n");
+  const lines2 = raw2.split("\n");
+
+  let data1Set = new Set();
+
+  // Ambil Data 1
+  lines1.forEach((line, index) => {
+    if (index === 0) return; // skip header
+    let cols = line.split("\t");
+    if (cols.length > 1) {
+      let nama = cols[1].trim().toLowerCase();
+      if (nama) data1Set.add(nama);
+    }
+  });
+
+  // Ambil Data 2
+  let data2Set = new Set(
+    lines2.map(x => x.trim().toLowerCase()).filter(x => x !== "")
+  );
+
+  let tidakDiData2 = [];
+  let tidakDiData1 = [];
+
+  // Data1 → cek ke Data2
+  data1Set.forEach(nama => {
+    if (!data2Set.has(nama)) {
+      tidakDiData2.push(nama);
+    }
+  });
+
+  // Data2 → cek ke Data1
+  data2Set.forEach(nama => {
+    if (!data1Set.has(nama)) {
+      tidakDiData1.push(nama);
+    }
+  });
+
+  const tbody = document.getElementById("hasil");
+  const infoBox = document.getElementById("infoBox");
+
+  tbody.innerHTML = "";
+  infoBox.innerHTML = "";
+
+  let no = 1;
+
+  if (tidakDiData2.length === 0 && tidakDiData1.length === 0) {
+    infoBox.innerHTML = `<div class="info">✅ Semua data sudah sinkron</div>`;
+    return;
+  }
+
+  tidakDiData2.forEach(nama => {
+    tbody.innerHTML += `
+      <tr>
+        <td>${no++}</td>
+        <td class="tidak2">${nama}</td>
+        <td>Tidak ada di Data 2</td>
+      </tr>
+    `;
+  });
+
+  tidakDiData1.forEach(nama => {
+    tbody.innerHTML += `
+      <tr>
+        <td>${no++}</td>
+        <td class="tidak1">${nama}</td>
+        <td>Tidak ada di Data 1</td>
+      </tr>
+    `;
+  });
+}
+
+// ================== BACK & REFRESH ==================
+function goBack() {
+  window.location.href = "index.html"; // langsung ke index.html
+}
+
+function resetAll() {
+  document.getElementById("data1").value = "";
+  document.getElementById("data2").value = "";
+  document.getElementById("hasil").innerHTML = "";
+  document.getElementById("infoBox").innerHTML = "";
+}
+
+// ================== FIRE EFFECT ==================
+const canvas = document.getElementById('fireCanvas');
+const ctx = canvas.getContext('2d');
+
+let w, h;
+function resize() { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; }
+window.addEventListener('resize', resize);
+resize();
+
+class FireParticle {
+  constructor() { this.reset(); }
+  reset() {
+    this.x = Math.random() * w;
+    this.y = h + Math.random() * 50;
+    this.size = 8 + Math.random() * 20;
+    this.speedY = 1 + Math.random() * 3;
+    this.speedX = (Math.random()-0.5)*1.5;
+    this.life = 0;
+    this.maxLife = 80 + Math.random()*40;
+    this.opacity = 1;
+  }
+  update() {
+    this.x += this.speedX + Math.sin(this.life*0.1)*0.5;
+    this.y -= this.speedY;
+    this.life++;
+    this.opacity = 1 - this.life/this.maxLife;
+    this.size *= 0.98;
+    if(this.life >= this.maxLife || this.size <1) this.reset();
+  }
+  draw() {
+    const gradient = ctx.createRadialGradient(this.x,this.y,0,this.x,this.y,this.size);
+    gradient.addColorStop(0, `rgba(255,255,200,${this.opacity})`);
+    gradient.addColorStop(0.3, `rgba(255,200,0,${this.opacity})`);
+    gradient.addColorStop(0.6, `rgba(255,100,0,${this.opacity*0.8})`);
+    gradient.addColorStop(1, `rgba(255,0,0,0)`);
+    ctx.fillStyle = gradient;
+    ctx.beginPath();
+    ctx.arc(this.x,this.y,this.size,0,Math.PI*2);
+    ctx.fill();
+  }
+}
+
+const particles = [];
+for(let i=0;i<160;i++) particles.push(new FireParticle());
+function animate() {
+  ctx.clearRect(0,0,w,h);
+  particles.forEach(p=>{p.update(); p.draw();});
+  requestAnimationFrame(animate);
+}
+animate();
+</script>
+
+</body>
+</html>
