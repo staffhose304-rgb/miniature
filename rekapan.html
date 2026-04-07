@@ -5,117 +5,120 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Menu Rekapan</title>
 <style>
-  body {
-    font-family: Arial, sans-serif;
+/* ===== BODY & BACKGROUND ===== */
+body {
     margin: 0;
-    padding: 0;
-    background: url('background.jpg') no-repeat center center fixed;
-    background-size: cover;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    min-height: 100vh;
-    color: white;
-    position: relative;
-    overflow: hidden;
-  }
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(270deg, #1f1f1f, #2b2b2b, #1f1f1f);
+    background-size: 600% 600%;
+    animation: bgMove 15s ease infinite;
+    color: #e5e5e5;
+    overflow-x: hidden;
+}
 
-  .container {
+@keyframes bgMove {
+    0% {background-position: 0%}
+    50% {background-position: 100%}
+    100% {background-position: 0%}
+}
+
+/* ===== HEADER ===== */
+.header {
     width: 90%;
     max-width: 1000px;
-    background: rgba(0,0,0,0.85);
-    padding: 20px;
-    margin-top: 40px;
+    margin: 20px auto 10px auto;
+    padding: 15px 20px;
+    background: rgba(255,255,255,0.05);
     border-radius: 12px;
+    text-align: center;
+    font-size: 22px;
+    font-weight: bold;
+    color: #fff;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+}
+
+/* ===== CONTAINER ===== */
+.container {
+    width: 90%;
+    max-width: 1000px;
+    margin: 20px auto 50px auto;
+    background: rgba(0,0,0,0.65);
+    padding: 25px;
+    border-radius: 15px;
+    box-sizing: border-box;
     position: relative;
     z-index: 2;
-  }
+}
 
-  .back-btn {
+/* ===== BACK BUTTON ===== */
+.back-btn {
     position: fixed;
     top: 20px;
     left: 20px;
-    padding: 8px 15px;
+    padding: 10px 18px;
     background: orange;
     color: white;
     font-weight: bold;
     border: none;
-    border-radius: 5px;
+    border-radius: 6px;
     cursor: pointer;
-    box-shadow: 0 0 6px orange;
+    box-shadow: 0 0 8px orange;
     z-index: 3;
-  }
-  .back-btn:hover {
-    background: darkorange;
-  }
+    transition: 0.25s;
+}
+.back-btn:hover { background: darkorange; }
 
-  textarea {
+/* ===== TEXTAREA & BUTTON ===== */
+textarea {
     width: 100%;
     height: 150px;
     font-family: monospace;
     font-size: 14px;
     padding: 10px;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
     border-radius: 8px;
     border: none;
-    background: #333;
-    color: white;
+    background: #222;
+    color: #fff;
     box-sizing: border-box;
-    position: relative;
-    z-index: 2;
-  }
+}
 
-  button.action-btn {
-    padding: 8px 15px;
-    margin-right: 10px;
+button.action-btn {
+    padding: 10px 18px;
+    margin-right: 12px;
     background: orange;
     border: none;
-    border-radius: 5px;
+    border-radius: 6px;
     cursor: pointer;
     font-weight: bold;
     color: white;
-    box-shadow: 0 0 6px orange;
-    position: relative;
-    z-index: 2;
-  }
-  button.action-btn:hover {
-    background: darkorange;
-  }
+    box-shadow: 0 0 8px orange;
+    transition: 0.25s;
+}
+button.action-btn:hover { background: darkorange; }
 
-  #rekapanOutput {
-    margin-top: 15px;
+/* ===== OUTPUT ===== */
+#rekapanOutput {
+    margin-top: 20px;
     overflow-x: auto;
-    position: relative;
-    z-index: 2;
-  }
+}
 
-  table {
+table {
     width: 100%;
     border-collapse: collapse;
-  }
-  th, td {
+}
+th, td {
     border: 1px solid #ccc;
     padding: 6px 10px;
     text-align: right;
-  }
-  th {
-    background: #ff9900;
-    color: black;
-  }
-  th.sub {
-    background: #ffd699;
-  }
-  td.blue {
-    color: blue;
-    font-weight: bold;
-  }
-  td.red {
-    color: red;
-    font-weight: bold;
-  }
+}
+th { background: #ff9900; color: black; }
+th.sub { background: #ffd699; }
+td.blue { color: #00ccff; font-weight: bold; }
+td.red { color: #ff4444; font-weight: bold; }
 
-  /* Container api */
-  .fire-container {
+/* ===== FIRE ANIMATION ===== */
+.fire-container {
     position: absolute;
     bottom: 0;
     width: 100%;
@@ -123,9 +126,8 @@
     pointer-events: none;
     overflow: visible;
     z-index: 1;
-  }
-
-  .flame {
+}
+.flame {
     position: absolute;
     bottom: 0;
     border-radius: 50%;
@@ -134,9 +136,8 @@
     animation-name: rise;
     animation-iteration-count: infinite;
     animation-timing-function: linear;
-  }
-
-  .spark {
+}
+.spark {
     position: absolute;
     bottom: 0;
     width: 2px;
@@ -147,92 +148,83 @@
     animation-name: sparkRise;
     animation-iteration-count: infinite;
     animation-timing-function: linear;
-  }
-
-  @keyframes rise {
+}
+@keyframes rise {
     0% { transform: translateY(0) scale(1); opacity: 0.7; }
     50% { transform: translateY(-80px) scale(1.2); opacity: 0.5; }
     100% { transform: translateY(-250px) scale(0.5); opacity: 0; }
-  }
-
-  @keyframes sparkRise {
+}
+@keyframes sparkRise {
     0% { transform: translateY(0) scale(1); opacity: 0.8; }
     100% { transform: translateY(-300px) scale(0.2); opacity: 0; }
-  }
+}
 </style>
 </head>
 <body>
 
+<div class="header">📊 REKAPAN DATA LAPORAN</div>
+
 <button class="back-btn" onclick="goBack()">Back</button>
 
 <div class="container">
-<h2>Rekapan Data Laporan</h2>
-
-<textarea id="rekapanInput" placeholder="Paste data laporan di sini, setiap kolom dipisah tab (TO, WL)"></textarea>
-
-<button class="action-btn" onclick="convertRekapan()">Convert</button>
-<button class="action-btn" onclick="copyRekapan()">Copy Nominal</button>
-
-<div id="rekapanOutput"></div>
+    <textarea id="rekapanInput" placeholder="Paste data laporan di sini, setiap kolom dipisah tab (TO, WL)"></textarea>
+    <button class="action-btn" onclick="convertRekapan()">Convert</button>
+    <button class="action-btn" onclick="copyRekapan()">Copy Nominal</button>
+    <div id="rekapanOutput"></div>
 </div>
 
 <div class="fire-container" id="fireContainer"></div>
 
 <script>
-// Membuat api lebih hidup
-const fireContainer = document.getElementById('fireContainer');
+// ===== BACK BUTTON =====
+function goBack(){ window.location.href="index.html"; }
 
-// Tambahkan flame besar
-for(let i=0; i<30; i++){
+// ===== FIRE ANIMATION =====
+const fireContainer = document.getElementById('fireContainer');
+for(let i=0;i<30;i++){
     const flame = document.createElement('div');
     flame.classList.add('flame');
-    flame.style.left = Math.random() * 100 + '%';
-    flame.style.width = 10 + Math.random()*20 + 'px';
-    flame.style.height = 20 + Math.random()*50 + 'px';
-    flame.style.background = `radial-gradient(circle, rgba(255,${100+Math.random()*155},0,1) 0%, rgba(255,0,0,0.5) 70%, transparent 100%)`;
-    flame.style.animationDuration = (1 + Math.random()*2) + 's';
+    flame.style.left=Math.random()*100+'%';
+    flame.style.width=10+Math.random()*20+'px';
+    flame.style.height=20+Math.random()*50+'px';
+    flame.style.background=`radial-gradient(circle, rgba(255,${100+Math.random()*155},0,1) 0%, rgba(255,0,0,0.5) 70%, transparent 100%)`;
+    flame.style.animationDuration=(1+Math.random()*2)+'s';
     fireContainer.appendChild(flame);
 }
-
-// Tambahkan percikan kecil
-for(let i=0; i<50; i++){
-    const spark = document.createElement('div');
+for(let i=0;i<50;i++){
+    const spark=document.createElement('div');
     spark.classList.add('spark');
-    spark.style.left = Math.random() * 100 + '%';
-    spark.style.animationDuration = (0.5 + Math.random()*1.5) + 's';
+    spark.style.left=Math.random()*100+'%';
+    spark.style.animationDuration=(0.5+Math.random()*1.5)+'s';
     fireContainer.appendChild(spark);
 }
 
-// Fungsi Rekapan (sama seperti sebelumnya)
-function parseNumber(val) {
-    if (!val) return 0;
-    val = val.replace(/,/g, "").trim();
-    if (val.startsWith("(") && val.endsWith(")")) {
-        return -parseFloat(val.replace(/[()]/g, ""));
-    }
+// ===== REKAPAN FUNCTIONS =====
+function parseNumber(val){
+    if(!val) return 0;
+    val = val.replace(/,/g,"").trim();
+    if(val.startsWith("(") && val.endsWith(")")) return -parseFloat(val.replace(/[()]/g,""));
     return parseFloat(val) || 0;
 }
 
-function formatNumber(num) {
+function formatNumber(num){
     let sign = num < 0 ? "-" : "";
     let abs = Math.abs(num);
-    return sign + abs.toLocaleString("en-US", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-    });
+    return sign + abs.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
-function convertRekapan() {
+function convertRekapan(){
     const text = document.getElementById("rekapanInput").value.trim();
-    if (!text) { alert("Masukkan data terlebih dahulu!"); return; }
+    if(!text){ alert("Masukkan data terlebih dahulu!"); return; }
+
     const rows = text.split("\n");
     let data = {};
-    rows.forEach(r => {
+    rows.forEach(r=>{
         const col = r.split(/\t+/);
         const name = col[0]?.toLowerCase();
         const turnover = parseNumber(col[1]);
         const wl = parseNumber(col[3]);
-        if (name) data[name] = { to: turnover, wl: wl };
+        if(name) data[name] = { to: turnover, wl: wl };
     });
 
     const mapping = {
@@ -248,14 +240,14 @@ function convertRekapan() {
     };
 
     let html = "<table><tr>";
-    for (let key in mapping) html += `<th colspan='2'>${key}</th>`;
+    for(let key in mapping) html += `<th colspan='2'>${key}</th>`;
     html += "</tr><tr>";
-    for (let key in mapping) html += "<th class='sub'>TO</th><th class='sub'>WL</th>";
+    for(let key in mapping) html += "<th class='sub'>TO</th><th class='sub'>WL</th>";
     html += "</tr><tr>";
-    for (let key in mapping) {
+    for(let key in mapping){
         const g = data[mapping[key]];
-        if (!g) { html += "<td></td><td></td>"; }
-        else {
+        if(!g){ html+="<td></td><td></td>"; }
+        else{
             const wlFlipped = g.wl * -1;
             html += `<td class='blue'>${formatNumber(g.to)}</td>`;
             html += `<td class='red'>${formatNumber(wlFlipped)}</td>`;
@@ -265,17 +257,15 @@ function convertRekapan() {
     document.getElementById("rekapanOutput").innerHTML = html;
 }
 
-function copyRekapan() {
+function copyRekapan(){
     const output = document.getElementById("rekapanOutput");
     const cells = output.querySelectorAll("td");
-    if (!cells.length) { alert("Tidak ada data untuk dicopy!"); return; }
+    if(!cells.length){ alert("Tidak ada data untuk dicopy!"); return; }
     const result = Array.from(cells).map(c => c.innerText);
     navigator.clipboard.writeText(result.join("\t"))
-        .then(() => alert("Nominal berhasil dicopy!"))
-        .catch(() => alert("Gagal menyalin data."));
+        .then(()=>alert("Nominal berhasil dicopy!"))
+        .catch(()=>alert("Gagal menyalin data."));
 }
-
-function goBack() { window.location.href = "index.html"; }
 </script>
 </body>
 </html>
