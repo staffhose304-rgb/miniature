@@ -6,18 +6,24 @@
 <title>Menu Struk Bank</title>
 
 <style>
-body, html {
-  margin: 0;
-  padding: 0;
-  font-family: Arial, sans-serif;
-  height: 100%;
-  background: #000;
-  color: white;
-  overflow: hidden;
-  position: relative;
+body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(270deg, #1f1f1f, #2b2b2b, #1f1f1f);
+    background-size: 600% 600%;
+    animation: bgMove 15s ease infinite;
+    color: #e5e5e5;
+    overflow-x: hidden;
 }
 
-/* Background Bara Api */
+/* animasi background */
+@keyframes bgMove {
+    0% {background-position: 0%}
+    50% {background-position: 100%}
+    100% {background-position: 0%}
+}
+
+/* canvas api tetap */
 #fireCanvas {
   position: fixed;
   top: 0;
@@ -26,86 +32,144 @@ body, html {
   height: 100%;
   z-index: 0;
   pointer-events: none;
-  filter: brightness(1.1);
+  opacity: 0.4;
 }
 
-.overlay {
-  position: relative;
-  z-index: 1;
-  min-height: 100vh;
-  background: rgba(0,0,0,0.85);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 20px;
-  box-sizing: border-box;
+/* HEADER */
+.header {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 30px;
+    margin: 15px;
+    border-radius: 15px;
+
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(10px);
+
+    border: 1px solid rgba(255,255,255,0.1);
+    box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+    z-index: 2;
 }
 
-h1 {
-  color: orange;
-  margin-bottom: 40px;
-  text-align: center;
+.title {
+    font-size: 20px;
+    font-weight: bold;
+    background: linear-gradient(90deg, #ffffff, #aaaaaa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: 2px;
 }
 
-.menu-bar {
-  display: flex;
-  gap: 20px;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
-.menu-bar button {
-  padding: 15px 40px;
-  font-size: 18px;
-  font-weight: bold;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  background: orange;
-  color: white;
-  box-shadow: 0 0 15px orange;
-  transition: 0.3s;
-  min-width: 180px;
-}
-
-.menu-bar button:hover {
-  background: darkorange;
-  transform: scale(1.05);
-}
-
-/* Tombol Back di pojok kiri atas */
+/* BACK BUTTON */
 #backBtn {
-  position: fixed;
-  top: 10px;
-  left: 10px;
-  padding: 10px 18px;
-  font-weight: bold;
+  padding: 8px 15px;
+  border-radius: 10px;
   font-size: 14px;
-  background: #ff6d00;
-  color: white;
+  font-weight: bold;
+  background: #111;
+  color: #00ffcc;
   border: none;
-  border-radius: 6px;
   cursor: pointer;
-  z-index: 10;
-  box-shadow: 0 0 8px #ff6d00;
+  box-shadow: 0 0 10px rgba(0,255,200,0.5);
   transition: 0.3s;
 }
 #backBtn:hover {
-  background: darkorange;
   transform: scale(1.05);
 }
+
+/* WRAPPER */
+.overlay {
+  position: relative;
+  z-index: 1;
+  padding: 30px;
+}
+
+/* TITLE */
+h1 {
+  text-align: center;
+  margin-bottom: 30px;
+  letter-spacing: 2px;
+}
+
+/* MENU GRID */
+.menu-bar {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 25px;
+}
+
+/* CARD STYLE */
+.menu-bar button {
+    background: #ffffff;
+    color: #111;
+    border-radius: 15px;
+    padding: 25px;
+    text-align: center;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: 0.35s;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+    border: none;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+/* shine effect */
+.menu-bar button::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 60%;
+    height: 100%;
+    background: linear-gradient(
+        120deg,
+        transparent,
+        rgba(255,255,255,0.8),
+        transparent
+    );
+    transform: skewX(-20deg);
+}
+
+.menu-bar button:hover::before {
+    animation: shine 0.8s;
+}
+
+@keyframes shine {
+    100% {
+        left: 150%;
+    }
+}
+
+/* hover effect */
+.menu-bar button:hover {
+    transform: translateY(-10px) scale(1.05);
+    box-shadow: 0 15px 35px rgba(255,255,255,0.2);
+}
+
+/* klik effect */
+.menu-bar button:active {
+    transform: scale(0.95);
+}
+
 </style>
 </head>
+
 <body>
 
 <canvas id="fireCanvas"></canvas>
 
-<!-- Tombol Back -->
-<button id="backBtn" onclick="goBack()">Back</button>
+<!-- HEADER -->
+<div class="header">
+    <div class="title">🏦 MENU STRUK BANK</div>
+    <button id="backBtn" onclick="goBack()">⬅ BACK</button>
+</div>
 
 <div class="overlay">
-  <h1>MENU STRUK BANK</h1>
+  <h1>Pilih Bank</h1>
 
   <div class="menu-bar">
     <button onclick="goTo('bca.html')">BCA</button>
@@ -120,12 +184,11 @@ function goTo(page){
   window.location.href = page;
 }
 
-// Fungsi back ke index.html
 function goBack(){
   window.location.href = "index.html";
 }
 
-/* ================== BARA API EFFECT ================== */
+/* ================== FIRE EFFECT (TIDAK DIUBAH) ================== */
 const canvas = document.getElementById('fireCanvas');
 const ctx = canvas.getContext('2d');
 let width, height;
