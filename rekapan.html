@@ -88,7 +88,7 @@ textarea {
     font-family: monospace;
 }
 
-/* BUTTON STYLE */
+/* BUTTON */
 .action-btn {
     padding: 12px 20px;
     border-radius: 10px;
@@ -105,17 +105,29 @@ textarea {
     box-shadow: 0 0 10px rgba(255,255,255,0.1);
 }
 
-/* TABLE */
-table {
-    width: 100%;
-    border-collapse: collapse;
+/* OUTPUT WRAPPER (FIX UTAMA) */
+#rekapanOutput {
     margin-top: 20px;
+    overflow-x: auto;
+    padding-bottom: 5px;
 }
+
+/* TABLE FIX */
+table {
+    border-collapse: collapse;
+    min-width: 900px;
+    width: max-content;
+}
+
+/* CELL */
 th, td {
     border: 1px solid #2a2a2a;
-    padding: 8px;
+    padding: 8px 12px;
     text-align: right;
+    white-space: nowrap;
+    font-size: 13px;
 }
+
 th {
     background: #111;
     color: #fff;
@@ -123,9 +135,18 @@ th {
 th.sub {
     background: #1a1a1a;
 }
+
 td.blue { color: #00ccff; font-weight: bold; }
 td.red { color: #ff4444; font-weight: bold; }
 
+/* SCROLLBAR */
+#rekapanOutput::-webkit-scrollbar {
+    height: 6px;
+}
+#rekapanOutput::-webkit-scrollbar-thumb {
+    background: #444;
+    border-radius: 10px;
+}
 </style>
 </head>
 
@@ -138,7 +159,7 @@ td.red { color: #ff4444; font-weight: bold; }
     <div class="clock" id="clock"></div>
 
     <div class="marquee">
-        <span>● CAPEK ITU WAJAR-MENYERAH ITU PILIHAN  "," NGGAK HARUS SEMPURNA-YANG PENTING TERUS BERJALAN ●</span>
+        <span>● CAPEK ITU WAJAR - MENYERAH ITU PILIHAN ● TERUS BERJALAN ●</span>
     </div>
 
     <textarea id="rekapanInput" placeholder="Paste data laporan di sini..."></textarea>
@@ -175,7 +196,7 @@ updateClock();
 // BACK
 function goBack(){ window.location.href="index.html"; }
 
-// ===== ORIGINAL FUNCTIONS (TIDAK DIUBAH) =====
+// ===== ORIGINAL (TIDAK DIUBAH) =====
 function parseNumber(val){
     if(!val) return 0;
     val = val.replace(/,/g,"").trim();
