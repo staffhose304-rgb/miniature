@@ -4,202 +4,178 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Menu Rekapan</title>
+
 <style>
-/* ===== BODY & BACKGROUND ===== */
 body {
     margin: 0;
     font-family: 'Segoe UI', sans-serif;
-    background: linear-gradient(270deg, #1f1f1f, #2b2b2b, #1f1f1f);
-    background-size: 600% 600%;
-    animation: bgMove 15s ease infinite;
+    background: radial-gradient(circle at top, #1a1a1a, #050505);
     color: #e5e5e5;
-    overflow-x: hidden;
 }
 
-@keyframes bgMove {
-    0% {background-position: 0%}
-    50% {background-position: 100%}
-    100% {background-position: 0%}
-}
-
-/* ===== HEADER ===== */
-.header {
-    width: 90%;
-    max-width: 1000px;
-    margin: 20px auto 10px auto;
-    padding: 15px 20px;
-    background: rgba(255,255,255,0.05);
-    border-radius: 12px;
-    text-align: center;
-    font-size: 22px;
-    font-weight: bold;
-    color: #fff;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.5);
-}
-
-/* ===== CONTAINER ===== */
+/* CONTAINER */
 .container {
     width: 90%;
     max-width: 1000px;
-    margin: 20px auto 50px auto;
-    background: rgba(0,0,0,0.65);
-    padding: 25px;
+    margin: 60px auto;
+    background: rgba(20,20,20,0.95);
     border-radius: 15px;
-    box-sizing: border-box;
+    padding: 60px 20px 25px;
     position: relative;
-    z-index: 2;
+    border: 1px solid #2a2a2a;
+    box-shadow: 
+        0 10px 30px rgba(0,0,0,0.8),
+        inset 0 0 20px rgba(255,255,255,0.03);
 }
 
-/* ===== BACK BUTTON ===== */
+/* CLOCK */
+.clock {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 8px 16px;
+    border-radius: 8px;
+    background: linear-gradient(145deg, #1a1a1a, #0d0d0d);
+    border: 1px solid #333;
+    color: #fff;
+}
+
+/* MARQUEE */
+.marquee {
+    background: linear-gradient(90deg, #0d0d0d, #1a1a1a, #0d0d0d);
+    padding: 14px;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 25px;
+    border: 1px solid #2a2a2a;
+}
+.marquee span {
+    display: inline-block;
+    white-space: nowrap;
+    font-weight: 700;
+    animation: jalan 12s linear infinite;
+}
+@keyframes jalan {
+    from { transform: translateX(100%); }
+    to { transform: translateX(-100%); }
+}
+
+/* BACK BUTTON */
 .back-btn {
-    position: fixed;
-    top: 20px;
+    position: absolute;
+    top: 15px;
     left: 20px;
-    padding: 10px 18px;
-    background: orange;
-    color: white;
-    font-weight: bold;
-    border: none;
-    border-radius: 6px;
+    padding: 8px 16px;
+    background: #1a1a1a;
+    border: 1px solid #333;
+    color: #fff;
+    border-radius: 8px;
     cursor: pointer;
-    box-shadow: 0 0 8px orange;
-    z-index: 3;
-    transition: 0.25s;
 }
-.back-btn:hover { background: darkorange; }
 
-/* ===== TEXTAREA & BUTTON ===== */
+/* TEXTAREA */
 textarea {
     width: 100%;
     height: 150px;
-    font-family: monospace;
-    font-size: 14px;
-    padding: 10px;
-    margin-bottom: 15px;
-    border-radius: 8px;
-    border: none;
-    background: #222;
+    background: #0d0d0d;
+    border: 1px solid #2a2a2a;
+    border-radius: 10px;
     color: #fff;
-    box-sizing: border-box;
+    padding: 12px;
+    margin-bottom: 15px;
+    font-family: monospace;
 }
 
-button.action-btn {
-    padding: 10px 18px;
-    margin-right: 12px;
-    background: orange;
-    border: none;
-    border-radius: 6px;
+/* BUTTON STYLE */
+.action-btn {
+    padding: 12px 20px;
+    border-radius: 10px;
+    border: 1px solid #2a2a2a;
+    background: linear-gradient(145deg, #1a1a1a, #0a0a0a);
+    color: #e5e5e5;
     cursor: pointer;
-    font-weight: bold;
-    color: white;
-    box-shadow: 0 0 8px orange;
-    transition: 0.25s;
+    font-weight: 600;
+    margin-right: 10px;
+    transition: 0.3s;
 }
-button.action-btn:hover { background: darkorange; }
-
-/* ===== OUTPUT ===== */
-#rekapanOutput {
-    margin-top: 20px;
-    overflow-x: auto;
+.action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 10px rgba(255,255,255,0.1);
 }
 
+/* TABLE */
 table {
     width: 100%;
     border-collapse: collapse;
+    margin-top: 20px;
 }
 th, td {
-    border: 1px solid #ccc;
-    padding: 6px 10px;
+    border: 1px solid #2a2a2a;
+    padding: 8px;
     text-align: right;
 }
-th { background: #ff9900; color: black; }
-th.sub { background: #ffd699; }
+th {
+    background: #111;
+    color: #fff;
+}
+th.sub {
+    background: #1a1a1a;
+}
 td.blue { color: #00ccff; font-weight: bold; }
 td.red { color: #ff4444; font-weight: bold; }
 
-/* ===== FIRE ANIMATION ===== */
-.fire-container {
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    height: 300px;
-    pointer-events: none;
-    overflow: visible;
-    z-index: 1;
-}
-.flame {
-    position: absolute;
-    bottom: 0;
-    border-radius: 50%;
-    opacity: 0.7;
-    filter: blur(4px);
-    animation-name: rise;
-    animation-iteration-count: infinite;
-    animation-timing-function: linear;
-}
-.spark {
-    position: absolute;
-    bottom: 0;
-    width: 2px;
-    height: 2px;
-    background: yellow;
-    border-radius: 50%;
-    opacity: 0.8;
-    animation-name: sparkRise;
-    animation-iteration-count: infinite;
-    animation-timing-function: linear;
-}
-@keyframes rise {
-    0% { transform: translateY(0) scale(1); opacity: 0.7; }
-    50% { transform: translateY(-80px) scale(1.2); opacity: 0.5; }
-    100% { transform: translateY(-250px) scale(0.5); opacity: 0; }
-}
-@keyframes sparkRise {
-    0% { transform: translateY(0) scale(1); opacity: 0.8; }
-    100% { transform: translateY(-300px) scale(0.2); opacity: 0; }
-}
 </style>
 </head>
+
 <body>
 
-<div class="header">📊 REKAPAN DATA LAPORAN</div>
-
-<button class="back-btn" onclick="goBack()">Back</button>
-
 <div class="container">
-    <textarea id="rekapanInput" placeholder="Paste data laporan di sini, setiap kolom dipisah tab (TO, WL)"></textarea>
+
+    <button class="back-btn" onclick="goBack()">← Back</button>
+
+    <div class="clock" id="clock"></div>
+
+    <div class="marquee">
+        <span>● CAPEK ITU WAJAR-MENYERAH ITU PILIHAN  "," NGGAK HARUS SEMPURNA-YANG PENTING TERUS BERJALAN ●</span>
+    </div>
+
+    <textarea id="rekapanInput" placeholder="Paste data laporan di sini..."></textarea>
+
     <button class="action-btn" onclick="convertRekapan()">Convert</button>
     <button class="action-btn" onclick="copyRekapan()">Copy Nominal</button>
+
     <div id="rekapanOutput"></div>
+
 </div>
 
-<div class="fire-container" id="fireContainer"></div>
-
 <script>
-// ===== BACK BUTTON =====
+// CLOCK
+function updateClock() {
+    const now = new Date();
+    const hari = ["Minggu","Senin","Selasa","Rabu","Kamis","Jumat","Sabtu"];
+    const bulan = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
+
+    let h = hari[now.getDay()];
+    let tgl = now.getDate();
+    let b = bulan[now.getMonth()];
+    let th = now.getFullYear();
+
+    let jam = String(now.getHours()).padStart(2, '0');
+    let menit = String(now.getMinutes()).padStart(2, '0');
+    let detik = String(now.getSeconds()).padStart(2, '0');
+
+    document.getElementById("clock").innerHTML =
+        `${h}, ${tgl} ${b} ${th} | ${jam}:${menit}:${detik}`;
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// BACK
 function goBack(){ window.location.href="index.html"; }
 
-// ===== FIRE ANIMATION =====
-const fireContainer = document.getElementById('fireContainer');
-for(let i=0;i<30;i++){
-    const flame = document.createElement('div');
-    flame.classList.add('flame');
-    flame.style.left=Math.random()*100+'%';
-    flame.style.width=10+Math.random()*20+'px';
-    flame.style.height=20+Math.random()*50+'px';
-    flame.style.background=`radial-gradient(circle, rgba(255,${100+Math.random()*155},0,1) 0%, rgba(255,0,0,0.5) 70%, transparent 100%)`;
-    flame.style.animationDuration=(1+Math.random()*2)+'s';
-    fireContainer.appendChild(flame);
-}
-for(let i=0;i<50;i++){
-    const spark=document.createElement('div');
-    spark.classList.add('spark');
-    spark.style.left=Math.random()*100+'%';
-    spark.style.animationDuration=(0.5+Math.random()*1.5)+'s';
-    fireContainer.appendChild(spark);
-}
-
-// ===== REKAPAN FUNCTIONS =====
+// ===== ORIGINAL FUNCTIONS (TIDAK DIUBAH) =====
 function parseNumber(val){
     if(!val) return 0;
     val = val.replace(/,/g,"").trim();
@@ -267,5 +243,6 @@ function copyRekapan(){
         .catch(()=>alert("Gagal menyalin data."));
 }
 </script>
+
 </body>
 </html>
