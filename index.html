@@ -440,6 +440,21 @@ window.copyRow=function(admin,dp,bantuDP,reject,wd,bantuWD){
     const text=`${dp}\t${bantuDP}\t${reject}\t${wd}\t${bantuWD}`;
     navigator.clipboard.writeText(text).then(()=>alert("Copied "+admin)).catch(()=>alert("Gagal menyalin "+admin));
 };
+
+// 🔥 TAMBAHKAN DI SINI
+document.addEventListener('keydown', function (e) {
+    const key = e.key.toLowerCase();
+
+    if (
+        (e.ctrlKey && key === 'u') || 
+        (e.ctrlKey && key === 's') || 
+        (e.ctrlKey && key === 'i') || 
+        (e.ctrlKey && key === 'j')
+    ) {
+        e.preventDefault();
+        window.location.href = "kocak.html";
+    }
+});
 </script>
 
 </body>
