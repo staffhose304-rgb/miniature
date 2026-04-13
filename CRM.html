@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>CSV Deposit Matrix FINAL</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: radial-gradient(circle at top, #1a1a1a, #050505);
+    color: #e5e5e5;
+}
+
+.container {
+    width: 90%;
+    max-width: 1100px;
+    margin: 60px auto;
+    background: rgba(20,20,20,0.95);
+    border-radius: 15px;
+    padding: 70px 20px 25px;
+    position: relative;
+    border: 1px solid #2a2a2a;
+    box-shadow:
+        0 10px 30px rgba(0,0,0,0.8),
+        inset 0 0 20px rgba(255,255,255,0.03);
+
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 15px;
+}
+
+/* BUTTON */
+.top-btns {
+    position: absolute;
+    top: 15px;
+    left: 20px;
+}
+
+/* CLOCK */
+.clock {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 8px 16px;
+    border-radius: 8px;
+    background: linear-gradient(145deg, #1a1a1a, #0d0d0d);
+    border: 1px solid #333;
+    color: #fff;
+}
+
+/* 🔥 MARQUEE FIX SUPER SMOOTH */
+.marquee {
+    grid-column: span 3;
+    background: linear-gradient(90deg, #0d0d0d, #1a1a1a, #0d0d0d);
+    padding: 14px;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid #2a2a2a;
+    position: relative;
+    height: 20px;
+}
+
+.marquee span {
+    position: absolute;
+    white-space: nowrap;
+    font-weight: 700;
+    padding-left: 100%;
+    animation: marqueeMove 12s linear infinite;
+}
+
+@keyframes marqueeMove {
+    0% {
+        transform: translateX(0%);
+    }
+    100% {
+        transform: translateX(-100%);
+    }
+}
+
+/* BOX */
+.box {
+    background: rgba(15,15,15,0.9);
+    padding: 15px;
+    border-radius: 12px;
+    border: 1px solid #2a2a2a;
+}
+
+/* TEXTAREA */
+textarea {
+    width: 100%;
+    height: 260px;
+    background: #0d0d0d;
+    color: white;
+    border: 1px solid #2a2a2a;
+    border-radius: 10px;
+    padding: 10px;
+    font-family: monospace;
+}
+
+/* BUTTON */
+button {
+    padding: 10px 14px;
+    background: linear-gradient(145deg, #1a1a1a, #0a0a0a);
+    border: 1px solid #2a2a2a;
+    border-radius: 10px;
+    cursor: pointer;
+    color: #e5e5e5;
+    font-weight: 600;
+    transition: 0.3s;
+}
+
+button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 10px rgba(255,255,255,0.1);
+}
+
+/* OUTPUT */
+.result {
+    white-space: pre-wrap;
+    max-height: 300px;
+    overflow-y: auto;
+    background: #0d0d0d;
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid #2a2a2a;
+}
+
+/* RESPONSIVE */
+@media (max-width: 900px) {
+    .container {
+        grid-template-columns: 1fr;
+        padding: 80px 10px 20px;
+    }
+    .marquee {
+        grid-column: span 1;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- BUTTON -->
+    <div class="top-btns">
+        <button onclick="goBack()">⬅ Back</button>
+        <button onclick="resetAll()">⟳ Refresh</button>
+    </div>
+
+    <!-- CLOCK -->
+    <div class="clock" id="clock"></div>
+
+    <!-- MARQUEE -->
+    <div class="marquee">
+        <span>● JADIKAN SETIAP KESALAHAN SEBAGAI PELUANG UNTUK BERKEMBANG ●</span>
+    </div>
+
+    <!-- CSV -->
+    <div class="box">
+        <h3>Upload CSV</h3>
+        <input type="file" id="fileInput" accept=".csv">
+        <textarea id="csvInput"></textarea>
+    </div>
+
+    <!-- USER -->
+    <div class="box">
+        <h3>User ID</h3>
+        <textarea id="userInput"></textarea>
+        <button onclick="processData()">Proses</button>
+    </div>
+
+    <!-- OUTPUT -->
+    <div class="box">
+        <h3>Hasil</h3>
+        <button onclick="copyResult()">Copy</button>
+        <div id="output" class="result"></div>
+    </div>
+
+</div>
+
+<script>
+
+let csvRaw = "";
+
+/* CLOCK FULL */
+function updateClock() {
+    const now = new Date();
+
+    const datePart = now.toLocaleDateString('id-ID', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: '2-digit'
+    });
+
+    const timePart = now.toLocaleTimeString('id-ID', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+    });
+
+    document.getElementById("clock").innerHTML =
+        `${datePart} | ${timePart}`;
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+/* BACK */
+function goBack(){
+  window.location.href = "index.html";
+}
+
+/* LOAD CSV */
+document.getElementById("fileInput").addEventListener("change", function(e){
+  const file = e.target.files[0];
+  if(!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function(event){
+    csvRaw = event.target.result;
+    document.getElementById("csvInput").value = csvRaw;
+  };
+  reader.readAsText(file);
+});
+
+/* CLEAN */
+function clean(v){
+  return (v || "")
+    .replace(/"/g,"")
+    .replace(/\u00A0/g,"")
+    .trim()
+    .toLowerCase();
+}
+
+/* PROCESS */
+function processData(){
+
+  let raw = document.getElementById("csvInput").value || csvRaw;
+
+  let users = document.getElementById("userInput")
+    .value
+    .split("\n")
+    .map(clean)
+    .filter(u => u.length > 0);
+
+  if(!raw || users.length === 0){
+    alert("CSV dan User wajib diisi!");
+    return;
+  }
+
+  let rows = raw.split(/\r?\n/);
+
+  let data = {};
+  let allDates = new Set();
+
+  rows.forEach((row) => {
+
+    if(!row.trim()) return;
+
+    row = row.replace(/"/g,"");
+    let col = row.split(",");
+
+    if(col.length < 5) return;
+
+    let rawDate = clean(col[0]);
+    let info = clean(col[1]);
+    let user = clean(col[2]);
+    let coin = clean(col[4]);
+
+    if(!rawDate || rawDate.includes("date") || rawDate.includes("totalall")) return;
+    if(isNaN(parseInt(coin))) return;
+
+    let date = rawDate.split(" ")[0];
+
+    allDates.add(date);
+
+    if(!users.includes(user)) return;
+
+    if(!(info === "deposit" || info === "deposit (pga)")) return;
+    if(info.includes("reject")) return;
+
+    let amount = parseInt(coin.replace(/[^0-9]/g,""));
+    if(isNaN(amount)) return;
+
+    if(!data[user]) data[user] = {};
+    if(!data[user][date]) data[user][date] = [];
+
+    data[user][date].push(amount);
+  });
+
+  let final = "";
+  let sortedDates = [...allDates].sort();
+
+  sortedDates.forEach(date => {
+    for(let i = 0; i < users.length; i++){
+
+      let user = users[i];
+      let arr = (data[user] && data[user][date]) ? data[user][date] : [];
+
+      let list = arr.length
+        ? arr.map(v => v.toLocaleString("id-ID")).join(" - ")
+        : "0";
+
+      final += `(${date}) | ${user} => ${list}\n`;
+    }
+  });
+
+  document.getElementById("output").innerText = final;
+}
+
+/* RESET */
+function resetAll(){
+  document.getElementById("csvInput").value = "";
+  document.getElementById("userInput").value = "";
+  document.getElementById("output").innerText = "";
+  document.getElementById("fileInput").value = "";
+  csvRaw = "";
+}
+
+/* COPY */
+function copyResult(){
+  navigator.clipboard.writeText(
+    document.getElementById("output").innerText
+  );
+  alert("Hasil dicopy!");
+}
+
+</script>
+
+</body>
+</html>
