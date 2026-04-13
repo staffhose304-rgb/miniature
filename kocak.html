@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Ngapain Bro 😏</title>
+<style>
+body {
+    margin: 0;
+    background: black;
+    color: #00ffcc;
+    font-family: monospace;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    text-align: center;
+}
+
+.box {
+    animation: glitch 1s infinite;
+}
+
+h1 {
+    font-size: 40px;
+}
+
+p {
+    font-size: 18px;
+    opacity: 0.8;
+}
+
+@keyframes glitch {
+    0% { transform: translate(0); }
+    20% { transform: translate(-2px, 2px); }
+    40% { transform: translate(2px, -2px); }
+    60% { transform: translate(-2px, -2px); }
+    80% { transform: translate(2px, 2px); }
+    100% { transform: translate(0); }
+}
+</style>
+</head>
+<body>
+
+<div class="box">
+    <h1>😏 KETANGKAP!</h1>
+    <p>Ngapain tekan <b>Ctrl + U</b> bro?</p>
+    <p>ahahahahha 🤨</p>
+    <p>ahahahahha 😌</p>
+    <br>
+    <p> ahahahahha 😆</p>
+</div>
+
+<script>
+// auto balik ke halaman utama setelah 4 detik
+setTimeout(() => {
+    window.location.href = "index.html";
+}, 4000);
+</script>
+
+</body>
+</html>
