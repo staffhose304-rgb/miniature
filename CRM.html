@@ -21,20 +21,19 @@ body {
     padding: 70px 20px 25px;
     position: relative;
     border: 1px solid #2a2a2a;
-    box-shadow:
-        0 10px 30px rgba(0,0,0,0.8),
-        inset 0 0 20px rgba(255,255,255,0.03);
-
+    box-shadow: 0 10px 30px rgba(0,0,0,0.8);
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     gap: 15px;
 }
 
-/* BUTTON */
+/* TOP BUTTON */
 .top-btns {
     position: absolute;
     top: 15px;
     left: 20px;
+    display:flex;
+    gap:10px;
 }
 
 /* CLOCK */
@@ -51,7 +50,7 @@ body {
     color: #fff;
 }
 
-/* 🔥 MARQUEE FIX SUPER SMOOTH */
+/* MARQUEE */
 .marquee {
     grid-column: span 3;
     background: linear-gradient(90deg, #0d0d0d, #1a1a1a, #0d0d0d);
@@ -72,12 +71,8 @@ body {
 }
 
 @keyframes marqueeMove {
-    0% {
-        transform: translateX(0%);
-    }
-    100% {
-        transform: translateX(-100%);
-    }
+    0% { transform: translateX(0%); }
+    100% { transform: translateX(-100%); }
 }
 
 /* BOX */
@@ -109,12 +104,6 @@ button {
     cursor: pointer;
     color: #e5e5e5;
     font-weight: 600;
-    transition: 0.3s;
-}
-
-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 0 10px rgba(255,255,255,0.1);
 }
 
 /* OUTPUT */
@@ -128,15 +117,16 @@ button:hover {
     border: 1px solid #2a2a2a;
 }
 
-/* RESPONSIVE */
-@media (max-width: 900px) {
-    .container {
-        grid-template-columns: 1fr;
-        padding: 80px 10px 20px;
-    }
-    .marquee {
-        grid-column: span 1;
-    }
+/* MENU */
+.menu-nav {
+    grid-column: span 3;
+    display:flex;
+    justify-content:center;
+    gap:10px;
+}
+
+.menu-nav button.active {
+    background:#333;
 }
 </style>
 </head>
@@ -145,7 +135,7 @@ button:hover {
 
 <div class="container">
 
-    <!-- BUTTON -->
+    <!-- TOP -->
     <div class="top-btns">
         <button onclick="goBack()">⬅ Back</button>
         <button onclick="resetAll()">⟳ Refresh</button>
@@ -154,16 +144,22 @@ button:hover {
     <!-- CLOCK -->
     <div class="clock" id="clock"></div>
 
+    <!-- MENU -->
+    <div class="menu-nav">
+        <button onclick="setMode('csv')" class="active">📁 Upload CSV</button>
+        <button onclick="setMode('manual')">⌨ Manual Input</button>
+    </div>
+
     <!-- MARQUEE -->
     <div class="marquee">
         <span>● JADIKAN SETIAP KESALAHAN SEBAGAI PELUANG UNTUK BERKEMBANG ●</span>
     </div>
 
-    <!-- CSV -->
+    <!-- INPUT -->
     <div class="box">
-        <h3>Upload CSV</h3>
+        <h3>Input Data</h3>
         <input type="file" id="fileInput" accept=".csv">
-        <textarea id="csvInput"></textarea>
+        <textarea id="csvInput" placeholder="Paste CSV / Manual Input di sini..."></textarea>
     </div>
 
     <!-- USER -->
@@ -185,164 +181,191 @@ button:hover {
 <script>
 
 let csvRaw = "";
+let mode = "csv";
 
-/* CLOCK FULL */
-function updateClock() {
-    const now = new Date();
-
-    const datePart = now.toLocaleDateString('id-ID', {
-        weekday: 'long',
-        year: 'numeric',
-        month: 'long',
-        day: '2-digit'
-    });
-
-    const timePart = now.toLocaleTimeString('id-ID', {
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit'
-    });
-
-    document.getElementById("clock").innerHTML =
-        `${datePart} | ${timePart}`;
-}
-setInterval(updateClock, 1000);
-updateClock();
+/* CLOCK */
+setInterval(()=>{
+    document.getElementById("clock").innerText =
+    new Date().toLocaleString('id-ID');
+},1000);
 
 /* BACK */
 function goBack(){
-  window.location.href = "index.html";
-}
-
-/* LOAD CSV */
-document.getElementById("fileInput").addEventListener("change", function(e){
-  const file = e.target.files[0];
-  if(!file) return;
-
-  const reader = new FileReader();
-  reader.onload = function(event){
-    csvRaw = event.target.result;
-    document.getElementById("csvInput").value = csvRaw;
-  };
-  reader.readAsText(file);
-});
-
-/* CLEAN */
-function clean(v){
-  return (v || "")
-    .replace(/"/g,"")
-    .replace(/\u00A0/g,"")
-    .trim()
-    .toLowerCase();
-}
-
-/* PROCESS */
-function processData(){
-
-  let raw = document.getElementById("csvInput").value || csvRaw;
-
-  let users = document.getElementById("userInput")
-    .value
-    .split("\n")
-    .map(clean)
-    .filter(u => u.length > 0);
-
-  if(!raw || users.length === 0){
-    alert("CSV dan User wajib diisi!");
-    return;
-  }
-
-  let rows = raw.split(/\r?\n/);
-
-  let data = {};
-  let allDates = new Set();
-
-  rows.forEach((row) => {
-
-    if(!row.trim()) return;
-
-    row = row.replace(/"/g,"");
-    let col = row.split(",");
-
-    if(col.length < 5) return;
-
-    let rawDate = clean(col[0]);
-    let info = clean(col[1]);
-    let user = clean(col[2]);
-    let coin = clean(col[4]);
-
-    if(!rawDate || rawDate.includes("date") || rawDate.includes("totalall")) return;
-    if(isNaN(parseInt(coin))) return;
-
-    let date = rawDate.split(" ")[0];
-
-    allDates.add(date);
-
-    if(!users.includes(user)) return;
-
-    if(!(info === "deposit" || info === "deposit (pga)")) return;
-    if(info.includes("reject")) return;
-
-    let amount = parseInt(coin.replace(/[^0-9]/g,""));
-    if(isNaN(amount)) return;
-
-    if(!data[user]) data[user] = {};
-    if(!data[user][date]) data[user][date] = [];
-
-    data[user][date].push(amount);
-  });
-
-  let final = "";
-  let sortedDates = [...allDates].sort();
-
-  sortedDates.forEach(date => {
-    for(let i = 0; i < users.length; i++){
-
-      let user = users[i];
-      let arr = (data[user] && data[user][date]) ? data[user][date] : [];
-
-      let list = arr.length
-        ? arr.map(v => v.toLocaleString("id-ID")).join(" - ")
-        : "0";
-
-      final += `(${date}) | ${user} => ${list}\n`;
-    }
-  });
-
-  document.getElementById("output").innerText = final;
+    window.location.href = "index.html";
 }
 
 /* RESET */
 function resetAll(){
-  document.getElementById("csvInput").value = "";
-  document.getElementById("userInput").value = "";
-  document.getElementById("output").innerText = "";
-  document.getElementById("fileInput").value = "";
-  csvRaw = "";
+
+    csvRaw = "";
+    mode = "csv";
+
+    document.getElementById("fileInput").value = "";
+    document.getElementById("csvInput").value = "";
+    document.getElementById("userInput").value = "";
+    document.getElementById("output").innerText = "";
+
+    document.getElementById("csvInput").placeholder = "ANES NGENES DI SINI ...";
+
+    let btns = document.querySelectorAll(".menu-nav button");
+    btns.forEach(b => b.classList.remove("active"));
+    btns[0].classList.add("active");
+}
+
+/* MODE SWITCH (INI FIX MANUAL INPUT) */
+function setMode(m){
+    mode = m;
+
+    let btns = document.querySelectorAll(".menu-nav button");
+
+    btns.forEach(b=>b.classList.remove("active"));
+    btns[m === "csv" ? 0 : 1].classList.add("active");
+
+    let input = document.getElementById("csvInput");
+    let fileInput = document.getElementById("fileInput");
+
+    if(m === "manual"){
+
+        // 🔥 SEMBUNYIKAN UPLOAD CSV
+        fileInput.style.display = "none";
+
+        input.placeholder =
+`MODE MANUAL INPUT (Paste dari Excel)
+
+Contoh:
+1   2026-04-15 13:32:25 Deposit (PGA)   userA   PGA 100000`;
+
+    } else {
+
+        // 🔥 TAMPILKAN LAGI SAAT MODE CSV
+        fileInput.style.display = "block";
+
+        input.placeholder = "Paste CSV di sini...";
+    }
+
+    input.value = "";
+}
+
+/* FILE LOAD */
+document.getElementById("fileInput").addEventListener("change", e=>{
+    let file = e.target.files[0];
+    if(!file) return;
+
+    let reader = new FileReader();
+    reader.onload = ev=>{
+        document.getElementById("csvInput").value = ev.target.result;
+    };
+    reader.readAsText(file);
+});
+
+/* CLEAN */
+function clean(v){
+    return (v || "")
+        .replace(/"/g,"")
+        .replace(/\u00A0/g,"")
+        .trim()
+        .toLowerCase();
+}
+
+/* PROCESS (FIXED FINAL ENGINE + MANUAL SUPPORT) */
+function processData(){
+
+    let raw = document.getElementById("csvInput").value || "";
+
+    let users = document.getElementById("userInput")
+        .value.split("\n")
+        .map(clean)
+        .filter(Boolean);
+
+    if(!raw || users.length === 0){
+        alert("CSV / Manual Input dan User wajib diisi!");
+        return;
+    }
+
+    let rows = raw.split(/\r?\n/);
+
+    let data = {};
+    let allDates = new Set();
+
+    rows.forEach(row=>{
+
+        if(!row.trim()) return;
+
+        row = row.replace(/"/g,"");
+
+        let col;
+
+if(mode === "manual"){
+    // PRIORITAS TAB (Excel)
+    col = row.includes("\t")
+        ? row.split("\t")
+        : row.trim().split(/\s{2,}/);
+} else {
+    col = row.split(",");
+}
+
+if(col.length < 5) return;
+
+let rawDate, info, user, coin;
+
+if(mode === "manual"){
+    rawDate = clean(col[1]); // tanggal
+    info    = clean(col[2]); // deposit
+    user    = clean(col[3]); // user
+    coin    = clean(col[5]); // coin
+} else {
+    rawDate = clean(col[0]);
+    info    = clean(col[1]);
+    user    = clean(col[2]);
+    coin    = clean(col[4]);
+}
+
+        if(!rawDate || rawDate.includes("date") || rawDate.includes("totalall")) return;
+
+        let amount = parseInt(coin.replace(/[^0-9]/g,""));
+        if(isNaN(amount)) return;
+
+        let date = rawDate.split(" ")[0];
+        allDates.add(date);
+
+        if(!users.includes(user)) return;
+
+        if(!(info === "deposit" || info === "deposit (pga)")) return;
+        if(info.includes("reject")) return;
+
+        if(!data[user]) data[user] = {};
+        if(!data[user][date]) data[user][date] = [];
+
+        data[user][date].push(amount);
+    });
+
+    let final = "";
+    let sortedDates = [...allDates].sort();
+
+    sortedDates.forEach(date=>{
+        users.forEach(user=>{
+
+            let arr = data[user]?.[date] || [];
+
+            let list = arr.length
+                ? arr.map(v=>v.toLocaleString("id-ID")).join(" - ")
+                : "0";
+
+            final += `(${date}) | ${user} => ${list}\n`;
+        });
+    });
+
+    document.getElementById("output").innerText = final;
 }
 
 /* COPY */
 function copyResult(){
-  navigator.clipboard.writeText(
-    document.getElementById("output").innerText
-  );
-  alert("Hasil dicopy!");
+    navigator.clipboard.writeText(
+        document.getElementById("output").innerText
+    );
+    alert("Hasil dicopy!");
 }
 
-// 🔥 TAMBAHKAN DI SINI
-document.addEventListener('keydown', function (e) {
-    const key = e.key.toLowerCase();
-
-    if (
-        (e.ctrlKey && key === 'u') || 
-        (e.ctrlKey && key === 's') || 
-        (e.ctrlKey && key === 'i') || 
-        (e.ctrlKey && key === 'j')
-    ) {
-        e.preventDefault();
-        window.location.href = "kocak.html";
-    }
-});
 </script>
 
 </body>
