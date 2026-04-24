@@ -442,6 +442,21 @@ document.getElementById("input-ref").value = refTime + refAjak;
 }
 
   window.onload = acakData;
+// 🔥 TAMBAHKAN DI SINI
+document.addEventListener('keydown', function (e) {
+    const key = e.key.toLowerCase();
+
+    if (
+        (e.ctrlKey && key === 'u') || 
+        (e.ctrlKey && key === 's') || 
+        (e.ctrlKey && key === 'i') || 
+        (e.ctrlKey && key === 'j')
+    ) {
+        e.preventDefault();
+        window.location.href = "kocak.html";
+    }
+});
 </script>
+
 </body>
 </html>
