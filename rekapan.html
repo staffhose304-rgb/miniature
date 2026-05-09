@@ -233,6 +233,7 @@ function convertRekapan(){
         "ARCADE": "arcade",
         "POKER": "poker",
         "ESPORTS": "esports",
+        "SPORTSBOOK": "sportsbook",
         "TOTALAN LIVEGAMES": "live game",
         "SLOT": "slot"
     };
@@ -264,21 +265,6 @@ function copyRekapan(){
         .then(()=>alert("Nominal berhasil dicopy!"))
         .catch(()=>alert("Gagal menyalin data."));
 }
-
-// 🔥 TAMBAHKAN DI SINI
-document.addEventListener('keydown', function (e) {
-    const key = e.key.toLowerCase();
-
-    if (
-        (e.ctrlKey && key === 'u') || 
-        (e.ctrlKey && key === 's') || 
-        (e.ctrlKey && key === 'i') || 
-        (e.ctrlKey && key === 'j')
-    ) {
-        e.preventDefault();
-        window.location.href = "kocak.html";
-    }
-});
 </script>
 
 </body>
